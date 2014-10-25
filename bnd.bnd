@@ -1,0 +1,14 @@
+-buildpath:  \
+	osgi.core;version=4.3,\
+	osgi.cmpn;version=4.3,\
+	org.greenscape.core;version=latest,\
+	com.fasterxml.jackson.core.jackson-databind,\
+	com.fasterxml.jackson.core.jackson-core,\
+	com.fasterxml.jackson.core.jackson-annotations
+Bundle-Version: 0.1.0
+Private-Package:  \
+	org.greenscape.core.impl,\
+	org.greenscape.core.service.impl,\
+	org.greenscape.core.impl.config.json
+-dsannotations:  \
+	*
