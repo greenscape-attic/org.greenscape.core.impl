@@ -21,9 +21,11 @@ import org.greenscape.core.impl.config.json.ResourceConfig;
 import org.greenscape.core.impl.config.json.ResourcesConfig;
 import org.greenscape.core.impl.config.json.WebletConfig;
 import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
@@ -146,6 +148,12 @@ public class ResourceRegistryImpl implements ResourceRegistry, EventHandler {
 
 	@Activate
 	public void activate(ComponentContext ctx, Map<String, Object> properties) {
+		registerExistingBundles(ctx);
+	}
+
+	@Modified
+	public void modified(ComponentContext ctx, Map<String, Object> properties) {
+		registerExistingBundles(ctx);
 	}
 
 	@Reference(policy = ReferencePolicy.DYNAMIC)
@@ -164,6 +172,16 @@ public class ResourceRegistryImpl implements ResourceRegistry, EventHandler {
 
 	public void unsetLogService(LogService logService) {
 		this.logService = null;
+	}
+
+	private void registerExistingBundles(ComponentContext ctx) {
+		BundleContext context = ctx.getBundleContext();
+		Bundle[] bundles = context.getBundles();
+		if (bundles != null) {
+			for (Bundle bundle : bundles) {
+				registerResources(bundle);
+			}
+		}
 	}
 
 	private void registerResources(Bundle bundle) {
