@@ -3,6 +3,7 @@ package org.greenscape.core.service.impl;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,7 +74,7 @@ public class ServiceImpl implements Service {
 			if (property == null) {
 				throw new PropertyNotFoundException("Property " + propertyName + " not found in model " + modelName);
 			}
-			List<String> values = properties.get(propertyName);
+			Collection<String> values = properties.get(propertyName);
 			List<Object> typedValues = new ArrayList<>();
 
 			if (values == null) {

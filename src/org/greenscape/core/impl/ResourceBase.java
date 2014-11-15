@@ -1,16 +1,16 @@
 package org.greenscape.core.impl;
 
-import java.util.List;
-
 import org.greenscape.core.Resource;
 import org.greenscape.core.ResourcePermission;
+import org.greenscape.core.ResourceState;
 import org.greenscape.core.ResourceType;
 
 public abstract class ResourceBase implements Resource {
 	private final String name;
 	private final ResourceType resourceType;
+	private ResourceState state;
 	private final long bundleId;
-	private List<ResourcePermission> resourcePermissions;
+	private final ResourcePermission resourcePermission;
 	private boolean initialised;
 
 	public ResourceBase(long bundleId, String name, ResourceType resourceType) {
@@ -18,6 +18,7 @@ public abstract class ResourceBase implements Resource {
 		this.name = name;
 		this.resourceType = resourceType;
 		this.initialised = false;
+		this.resourcePermission = new ResourcePermissionImpl();
 	}
 
 	@Override
@@ -31,8 +32,17 @@ public abstract class ResourceBase implements Resource {
 	}
 
 	@Override
-	public List<ResourcePermission> getPermissions() {
-		return resourcePermissions;
+	public ResourceState getState() {
+		return state;
+	}
+
+	void setState(ResourceState state) {
+		this.state = state;
+	}
+
+	@Override
+	public ResourcePermission getPermission() {
+		return resourcePermission;
 	}
 
 	@Override

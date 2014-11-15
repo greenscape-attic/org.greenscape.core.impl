@@ -9,12 +9,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.greenscape.core.Action;
 import org.greenscape.core.ModelResource;
 import org.greenscape.core.Property;
 import org.greenscape.core.Resource;
 import org.greenscape.core.ResourceEvent;
 import org.greenscape.core.ResourceRegistry;
 import org.greenscape.core.ResourceType;
+import org.greenscape.core.impl.config.json.ActionConfig;
 import org.greenscape.core.impl.config.json.ModelConfig;
 import org.greenscape.core.impl.config.json.PropertyConfig;
 import org.greenscape.core.impl.config.json.ResourceConfig;
@@ -207,16 +209,25 @@ public class ResourceRegistryImpl implements ResourceRegistry, EventHandler {
 	}
 
 	private void registerModelResource(ModelConfig config, Bundle bundle) {
+		if (resources.get(config.name.toLowerCase()) != null) {
+			logService.log(LogService.LOG_ERROR, "A resource with name `" + config.name + "` is already registered");
+			return;
+		}
 		ModelResourceImpl resource = new ModelResourceImpl(bundle.getBundleId(), config.name, ResourceType.Model);
 		resource.setModelClass(config.modelClass);
 		resource.setAbstract(config.isAbstract);
 		resource.setRemote(config.remote);
+		String remoteName;
 		if (config.remoteName != null && !config.remoteName.equals("")) {
-			resource.setRemoteName(config.remoteName);
+			remoteName = config.remoteName;
 		} else {
-			resource.setRemoteName(config.name);
+			remoteName = config.name;
 		}
-		// TODO: validate remote name is unique
+		if (getResourceByRemoteName(remoteName) == null) {
+			resource.setRemoteName(remoteName);
+		} else {
+			throw new IllegalArgumentException("The remote name `" + remoteName + "` is already registered");
+		}
 		if (config.inherits != null) {
 			for (String inherits : config.inherits) {
 				ModelResource parentResource = (ModelResource) getResource(inherits);
@@ -242,6 +253,8 @@ public class ResourceRegistryImpl implements ResourceRegistry, EventHandler {
 				resource.addProperty(property);
 			}
 		}
+		addPermissions(config, resource);
+
 		resources.put(resource.getName().toLowerCase(), resource);
 		if (!resource.isAbstract()) {
 			postEvent(TOPIC_RESOURCE_REGISTERED, resource, bundle);
@@ -259,6 +272,8 @@ public class ResourceRegistryImpl implements ResourceRegistry, EventHandler {
 		resource.setHelpURL(config.helpURL);
 		resource.setLoadJS(config.loadJS);
 		resource.setLoadCSS(config.loadCSS);
+		addPermissions(config, resource);
+
 		resources.put(resource.getName().toLowerCase(), resource);
 		postEvent(TOPIC_RESOURCE_REGISTERED, resource, bundle);
 	}
@@ -278,6 +293,27 @@ public class ResourceRegistryImpl implements ResourceRegistry, EventHandler {
 				}
 			} else if (resource.getType() == ResourceType.Weblet) {
 				postEvent(TOPIC_RESOURCE_UNREGISTERED, resource, bundle);
+			}
+		}
+	}
+
+	private void addPermissions(ResourceConfig config, Resource resource) {
+		if (config.permissions != null) {
+			if (config.permissions.supports != null) {
+				for (ActionConfig actionConfig : config.permissions.supports) {
+					Action action = new ActionImpl(actionConfig.action, actionConfig.bit);
+					resource.getPermission().getSupports().add(action);
+				}
+			}
+			if (config.permissions.guestDefaults != null) {
+				for (String action : config.permissions.guestDefaults) {
+					int i = resource.getPermission().getSupports().indexOf(new ActionImpl(action));
+					if (i >= 0) {
+						resource.getPermission().getGuestDefaults().add(resource.getPermission().getSupports().get(i));
+					} else {
+						logService.log(LogService.LOG_ERROR, "Invalid action in guestDefaults: " + action);
+					}
+				}
 			}
 		}
 	}
