@@ -46,8 +46,14 @@ public class ServiceImpl implements Service {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <M extends DocumentModel> M find(String modelName, String id) {
-		return (M) persistenceService.findById(modelName, id);
+	public <M extends DocumentModel> M find(String modelName, Object id) {
+		return (M) persistenceService.find(modelName, id);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public <M extends DocumentModel> M findByModelId(String modelName, String modelId) {
+		return (M) persistenceService.findByModelId(modelName, modelId);
 	}
 
 	@SuppressWarnings("unchecked")

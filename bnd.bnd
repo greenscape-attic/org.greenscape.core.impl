@@ -12,3 +12,5 @@ Private-Package:  \
 	org.greenscape.core.impl.config.json
 -dsannotations:  \
 	*
+javac.source: 1.7
+javac.target: 1.7
