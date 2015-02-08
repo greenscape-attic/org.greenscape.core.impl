@@ -1,6 +1,6 @@
 -buildpath:  \
-	osgi.core;version=4.3,\
-	osgi.cmpn;version=4.3,\
+	osgi.core;version=5.0,\
+	osgi.cmpn;version=5.0,\
 	org.greenscape.core;version=latest,\
 	com.fasterxml.jackson.core.jackson-databind,\
 	com.fasterxml.jackson.core.jackson-core,\
@@ -12,5 +12,5 @@ Private-Package:  \
 	org.greenscape.core.impl.config.json
 -dsannotations:  \
 	*
-javac.source: 1.7
-javac.target: 1.7
+javac.source: 1.8
+javac.target: 1.8
