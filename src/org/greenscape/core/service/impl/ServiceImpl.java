@@ -182,10 +182,9 @@ public class ServiceImpl implements Service {
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public <M extends DocumentModel> List<M> find(String modelName, String propertyName, Object value) {
-		return (List<M>) persistenceService.findByProperty(modelName, propertyName, value);
+		return (List<M>) persistenceService.<M>findByProperty(modelName, propertyName, value);
 	}
 
 	@SuppressWarnings("unchecked")
